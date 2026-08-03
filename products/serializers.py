@@ -27,9 +27,11 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True,read_only=True)
     variants = ProductVariantSerializer(many=True,read_only= True)
     category = CategorySerializer(read_only=True)
+    average_rating = serializers.FloatField(read_only =True)
 
     class Meta:
         model = Products
         fields = ['id','name','slug','description',
                   'category','brand','created_at',
-                  'updated_at','images','variants']
+                  'updated_at',"average_rating"
+                  ,'images','variants']
