@@ -19,7 +19,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
         has_purchesed = OrderItem.objects.filter(
             order__user =user,
-            order_status = 'paid',
+            order__status = 'paid',
             variant__product_id=product_id
         ).exists()
 
