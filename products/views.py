@@ -10,7 +10,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Products.objects.all()
+    queryset = Products.objects.all().order_by('-created_at')
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
-    
+
