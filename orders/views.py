@@ -5,7 +5,7 @@ from .models import Order,OrderItem
 from cart.models import Cart,CartItem
 from rest_framework import viewsets,decorators,status
 from .serializers import OrderItemSerializer,OrderSerializer
-
+from decimal import Decimal
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
 
@@ -19,15 +19,15 @@ class OrderViewSet(viewsets.ModelViewSet):
                 cart = Cart.objects.get(user = request.user)
             except Cart.DoesNotExist:
                 return Response({"error":"Cart dose not exist"},status=status.HTTP_400_BAD_REQUEST)
-            cart_item = Cart.items.all()
+            cart_items = cart.item.all()
 
-            if not cart_item.exists():
+            if not cart_items.exists():
                 return Response({"error":"Cart is empty"},status=status.HTTP_400_BAD_REQUEST)
 
             order = Order.objects.create(user=request.user,total_price=0)
-            total = 0
+            total = Decimal('0')
 
-            for item in cart_item:
+            for item in cart_items:
                 variant = item.variant
                 if variant.stock < item.quantity:
                     return Response({"error":f"{variant.product.name} inventory is not enough."},status=400)
@@ -39,7 +39,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 total+=(variant.price*item.quantity)
             order.total_price = total
             order.save()
-            cart.items.all().delete()
+            cart.item.all().delete()
             return Response({"message":"Order successfully placed.","order_id":order.id})
 
 
