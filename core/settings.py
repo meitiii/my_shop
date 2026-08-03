@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'reviews',
     #DRF
     'rest_framework',
-    'django-filter',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

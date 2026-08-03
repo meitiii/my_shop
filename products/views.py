@@ -5,6 +5,7 @@ from .models import Products,Category,ProductVariant,ProductImage
 from .serializers import ProductSerializer,CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
+
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
