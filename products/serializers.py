@@ -12,7 +12,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ['id','image','alt_text']
+        fields = ['id','image','alt_text','is_main','order']
+
 
 
 
@@ -29,9 +30,31 @@ class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     average_rating = serializers.FloatField(read_only =True)
 
+    thumbnail = serializers.SerializerMethodField(read_only =True)
+
+
     class Meta:
         model = Products
         fields = ['id','name','slug','description',
                   'category','brand','created_at',
                   'updated_at',"average_rating"
-                  ,'images','variants']
+                  ,'images','variants'
+                  ,'sku', 'short_description', 'features', 'technical_specs',
+                 'weight', 'dimensions', 'material', 'warranty',
+                  'country_of_origin', 'is_active', 'thumbnail'
+                  ]
+    def get_thumbnail(self,obj):
+        main_image = obj.objects.filter(is_main=True).first()
+
+        if main_image and main_image.image:
+            request = self.context.get('request')
+            if request :
+                return request.request.build_absolute_uri(main_image.image.url)
+            return main_image.image.url
+        first_image = obj.images.first()
+        if first_image and first_image.image:
+            request = self.context.get('request')
+            if request :
+                return request.request.build_absolute_uri(first_image.image.url)
+            return first_image.image.url
+        return None
