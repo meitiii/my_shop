@@ -4,7 +4,7 @@ from orders.models import Order,OrderItem
 from rest_framework import views,status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated
-from django.shortcuts import get_list_or_404,get_object_or_404
+from django.shortcuts import get_list_or_404,get_object_or_404,redirect
 import uuid
 
 
@@ -39,13 +39,14 @@ class PaymentVerifyView(views.APIView):
 
     def get(self,request):
         authority = request.query_params.get('authority')
+        FRONTEND_URL = "http://localhost:5173/payment/verify"
         if not authority:
             return Response({"error":"The authority parameter is required."},status=status.HTTP_400_BAD_REQUEST)
 
         payment = get_object_or_404(Payment,authority=authority)
 
         if payment.status=='successful':
-            return Response({"message":"This payment has already been approved."})
+            return redirect(f"{FRONTEND_URL}?status=success&message=This payment has already been approved.")
         payment.status = 'successful'
         payment.ref_id = str(uuid.uuid4().hex)[:10]
         payment.save()
@@ -54,11 +55,5 @@ class PaymentVerifyView(views.APIView):
         order.status = 'paid'
         order.save()
 
-        return Response(
-            {
-                "message":"Payment was successful.",
-                "ref_id" :payment.ref_id,
-                "order_id":order.id
-            }
-        )
+        return redirect(f"{FRONTEND_URL}?status=success&ref_id={payment.ref_id}&order_id={order.id}")
         

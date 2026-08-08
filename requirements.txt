@@ -1,0 +1,20 @@
+# --- هسته اصلی و فریم‌ورک ---
+Django==5.2.4
+djangorestframework==3.16.0
+django-cors-headers==4.7.0
+
+# --- احراز هویت (JWT) ---
+djangorestframework-simplejwt==5.5.0
+
+# --- ابزارهای API ---
+django-filter==25.1
+drf-spectacular==0.28.0
+
+# --- مدیریت تصاویر ---
+Pillow==11.3.0
+
+# --- ابزارهای پروداکشن و داکر ---
+gunicorn==21.2.0
+psycopg2-binary==2.9.10
+dj-database-url==2.1.0
+python-dotenv==1.0.1
