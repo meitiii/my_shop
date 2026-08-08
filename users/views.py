@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import generics
-from .serializers import RegisterSerializer,UserProfileSerializer
+from .serializers import RegisterSerializer,UserProfileSerializer,CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 User = get_user_model()
 
@@ -17,4 +18,9 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
 
