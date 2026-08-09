@@ -6,15 +6,16 @@ from .serializers import ProductSerializer,CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg,Q
 from .permissions import IsAdminOrReadOnly
+from rest_framework.viewsets import ModelViewSet
 
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
  
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+class ProductViewSet(ModelViewSet):
     #queryset = Products.objects.all().order_by('-created_at')
     queryset = Products.objects.annotate(average_rating=Avg('reviews__rating',filter=Q(reviews__is_approved=True))).order_by('-created_at')
 
