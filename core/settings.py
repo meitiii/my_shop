@@ -163,10 +163,10 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1), # برای پروداکشن واقعی این زمان رو بیشتر کن (مثلا 30 دقیقه)
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1), 
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
 }
 
 
@@ -186,9 +186,10 @@ SPECTACULAR_SETTINGS = {
 # ==========================================
 # CORS CONFIGURATION
 # ==========================================
-
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173", # توسعه (React Vite)
-    "http://localhost",      # داکر (Nginx)
+    "http://localhost:5173",
+    "http://localhost",
     "http://127.0.0.1",
+    "http://127.0.0.1:8080",
+    "http://localhost:8080",
 ]
