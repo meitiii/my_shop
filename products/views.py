@@ -2,12 +2,22 @@ from django.shortcuts import render
 from rest_framework import viewsets,filters
 from rest_framework.permissions import AllowAny
 from .models import Products,Category,ProductVariant,ProductImage
-from .serializers import ProductSerializer,CategorySerializer
+from .serializers import ProductSerializer,CategorySerializer,ProductImageSerializer,ProductVariantSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg,Q
 from .permissions import IsAdminOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 
+
+class ProductImageViewSet(ModelViewSet):
+    queryset = ProductImage.objects.all()
+    serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+class ProductVariantViewSet(ModelViewSet):
+    queryset = ProductVariant.objects.all()
+    serializer_class = ProductVariantSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()

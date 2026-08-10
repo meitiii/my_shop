@@ -11,13 +11,13 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ['id', 'image', 'alt_text', 'is_main', 'order']
+        fields = ['id','product', 'image', 'alt_text', 'is_main', 'order']
 
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ['id', 'color', 'size', 'price', 'stock']
+        fields = ['id','product', 'color', 'size', 'price', 'stock']
 
 
 class ProductSerializer(serializers.ModelSerializer):
