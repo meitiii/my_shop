@@ -25,6 +25,9 @@ class Address(models.Model):
     receiver_phone =models.CharField(max_length=11,blank=True,null=True)
     is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    lat = models.FloatField(blank=True, null=True)
+    lng = models.FloatField(blank=True, null=True)
 
     def save(self,*args, **kwargs):
         if self.is_default:
