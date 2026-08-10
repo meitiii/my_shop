@@ -23,7 +23,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id','email','username','first_name','last_name','phone_number')
-        read_only_filds = ('id','email','username')
+        read_only_feilds = ('id','email','username')
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
