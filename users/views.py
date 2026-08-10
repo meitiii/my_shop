@@ -84,7 +84,7 @@ class PasswordResetRequestView(APIView):
             return Response({"message":"If the email exists in the system, a recovery link was sent."})
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class ResetPasswordConfirmView(APIView):
+class PasswordResetConfirmView(APIView):
     permission_classes = [AllowAny]
 
     def post(self,request):
