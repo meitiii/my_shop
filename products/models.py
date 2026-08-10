@@ -36,6 +36,7 @@ class Products(models.Model):
     country_of_origin = models.CharField(max_length=100,blank=True,null=True)
 
     is_active = models.BooleanField(default=True,help_text='Product active/inactive status')
+    
 
     def __str__(self):
         return self.name
@@ -46,6 +47,8 @@ class ProductVariant(models.Model):
     color = models.CharField(max_length=50,blank=True,null=True)
     price = models.DecimalField(max_digits=10,decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
+    discount_percent = models.PositiveIntegerField(default=0, help_text="Discount percentage (0-100)")
+    
 
     def __str__(self):
         return f"{self.product.name} - {self.color or ''} {self.size or ''}"
