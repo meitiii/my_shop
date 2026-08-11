@@ -7,8 +7,46 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg,Q
 from .permissions import IsAdminOrReadOnly
 from rest_framework.viewsets import ModelViewSet
+from django_filters import rest_framework as django_filters
+class ProductFilter(django_filters.FilterSet):
 
+    brand = django_filters.BaseInFilter(
+        field_name='brand',
+        lookup_expr='in'
+    )
 
+    category = django_filters.NumberFilter(
+        method='filter_category'
+    )
+
+    def filter_category(self, queryset, name, value):
+        
+        if not value:
+            return queryset
+
+        try:
+            category = Category.objects.get(id=value)
+        except Category.DoesNotExist:
+            return queryset.none()
+
+        category_ids = [category.id]
+
+        def collect_children(parent_id):
+            children = Category.objects.filter(parent_id=parent_id)
+
+            for child in children:
+                category_ids.append(child.id)
+                collect_children(child.id)
+
+        collect_children(category.id)
+
+        return queryset.filter(
+            category_id__in=category_ids
+        )
+
+    class Meta:
+        model = Products
+        fields = ['category', 'brand', 'is_active']
 class ProductImageViewSet(ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
@@ -37,8 +75,8 @@ class ProductViewSet(ModelViewSet):
 
     
     filter_backends = [DjangoFilterBackend,filters.SearchFilter,filters.OrderingFilter]
-    filterset_fields = ['category','brand','is_active']
-    search_fields = ['name','description','slug','sku']
+    filterset_class = ProductFilter
+    search_fields = ['name', 'description', 'slug', 'sku', 'brand__name', 'category__name']
     ordering_fields = ['price','created_at']
 
 

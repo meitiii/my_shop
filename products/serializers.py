@@ -31,7 +31,8 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'image']
 class ProductSerializer(serializers.ModelSerializer):
 
-    
+    brand_name = serializers.CharField(source='brand.name', read_only=True)
+    category_name = serializers.CharField(source='category.name', read_only=True)
     category = CategorySerializer(read_only=True)
 
    
@@ -50,36 +51,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Products
-        fields = [
-            'id',
-            'name',
-            'slug',
-            'description',
-
-            # GET
-            'category',
-
-            # POST / PATCH
-            'category_id',
-
-            'brand',
-            'created_at',
-            'updated_at',
-            'average_rating',
-            'images',
-            'variants',
-            'sku',
-            'short_description',
-            'features',
-            'technical_specs',
-            'weight',
-            'dimensions',
-            'material',
-            'warranty',
-            'country_of_origin',
-            'is_active',
-            'thumbnail',
-        ]
+        fields = '__all__'
 
     def get_thumbnail(self, obj):
         main_image = obj.images.filter(is_main=True).first()
