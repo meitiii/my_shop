@@ -1,11 +1,17 @@
 from rest_framework import serializers
-from .models import Category, ProductImage, ProductVariant, Products
+from .models import Category, ProductImage, ProductVariant, Products,Brand
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    subcategories = serializers.SerializerMethodField()
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug', 'parent']
+        fields = ['id', 'name', 'slug', 'image','parent','subcategories']
+
+    def get_subcategories(self, obj):
+        if obj.subcategories.exists():
+            return CategorySerializer(obj.subcategories.all(), many=True).data
+        return []
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -19,7 +25,10 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         model = ProductVariant
         fields = ['id','product', 'color', 'size', 'price', 'stock','discount_percent']
 
-
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = ['id', 'name', 'slug', 'image']
 class ProductSerializer(serializers.ModelSerializer):
 
     

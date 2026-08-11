@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets,filters
 from rest_framework.permissions import AllowAny
-from .models import Products,Category,ProductVariant,ProductImage
-from .serializers import ProductSerializer,CategorySerializer,ProductImageSerializer,ProductVariantSerializer
+from .models import Products,Category,ProductVariant,ProductImage,Brand
+from .serializers import ProductSerializer,CategorySerializer,ProductImageSerializer,ProductVariantSerializer,BrandSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg,Q
 from .permissions import IsAdminOrReadOnly
@@ -24,7 +24,10 @@ class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
  
-
+class BrandViewSet(viewsets.ModelViewSet):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
+    permission_classes = [IsAdminOrReadOnly]
 class ProductViewSet(ModelViewSet):
     #queryset = Products.objects.all().order_by('-created_at')
     queryset = Products.objects.annotate(average_rating=Avg('reviews__rating',filter=Q(reviews__is_approved=True))).order_by('-created_at')

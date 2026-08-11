@@ -4,13 +4,24 @@ from  PIL import Image
 import io
 from django.core.files.base import ContentFile
 
+class Brand(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(unique=True,allow_unicode=True)
+    image = models.ImageField(upload_to='brands/images/', blank=True, null=True, help_text="Brand logo")
+
+
 class Category(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(unique=True, allow_unicode= True)
 
     parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='subcategories')
+    #image
+    image = models.ImageField(upload_to='categories/images/', blank=True, null=True, help_text="Category image")
+
 
     def __str__(self):
+        if self.parent:
+            return f"{self.parent.name} -> {self.name}"
         return self.name
 
 class Products(models.Model):
@@ -18,7 +29,7 @@ class Products(models.Model):
     slug = models.SlugField(unique=True,allow_unicode=True)
     description = models.TextField()
     category =models.ForeignKey(Category,on_delete=models.PROTECT,related_name='products')
-    brand = models.CharField(max_length=100,blank=True,null=True)
+    brand = models.ForeignKey(Brand,on_delete=models.SET_NULL,null=True,blank=True,related_name='products')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
