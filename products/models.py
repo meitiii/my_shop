@@ -47,6 +47,11 @@ class Products(models.Model):
     country_of_origin = models.CharField(max_length=100,blank=True,null=True)
 
     is_active = models.BooleanField(default=True,help_text='Product active/inactive status')
+
+
+    views_count = models.PositiveIntegerField(default=0, help_text=' Number of view')
+    sales_count = models.PositiveIntegerField(default=0, help_text='Number of sale')
+    is_featured = models.BooleanField(default=False, help_text='Selected product')
     
 
     def __str__(self):

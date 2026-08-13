@@ -4,10 +4,11 @@ from rest_framework.permissions import AllowAny
 from .models import Products,Category,ProductVariant,ProductImage,Brand
 from .serializers import ProductSerializer,CategorySerializer,ProductImageSerializer,ProductVariantSerializer,BrandSerializer
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Avg,Q
+from django.db.models import Avg,Q,Min
 from .permissions import IsAdminOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 from django_filters import rest_framework as django_filters
+from rest_framework.response import Response
 class ProductFilter(django_filters.FilterSet):
 
     brand = django_filters.BaseInFilter(
@@ -68,7 +69,13 @@ class BrandViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 class ProductViewSet(ModelViewSet):
     #queryset = Products.objects.all().order_by('-created_at')
-    queryset = Products.objects.annotate(average_rating=Avg('reviews__rating',filter=Q(reviews__is_approved=True))).order_by('-created_at')
+    queryset = Products.objects.annotate(
+    average_rating=Avg(
+        'reviews__rating',
+        filter=Q(reviews__is_approved=True)
+    ),
+    min_price=Min('variants__price')
+)
 
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -77,6 +84,20 @@ class ProductViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend,filters.SearchFilter,filters.OrderingFilter]
     filterset_class = ProductFilter
     search_fields = ['name', 'description', 'slug', 'sku', 'brand__name', 'category__name']
-    ordering_fields = ['price','created_at']
+    ordering_fields = [       
+        'min_price',       
+        'created_at',      
+        'sales_count',     
+        'views_count',     
+        'average_rating',  
+        'is_featured'      
+    ]
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()    
+        instance.views_count +=1
+        instance.save(update_fields=['views_count'])
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
