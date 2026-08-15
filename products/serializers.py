@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, ProductImage, ProductVariant, Products,Brand
+from .models import Category, ProductImage, ProductVariant, Products,Brand,HeroSlider
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -75,4 +75,11 @@ class ProductSerializer(serializers.ModelSerializer):
             return first_image.image.url
 
         return None
+
+
+
+class HeroSliderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HeroSlider
+        fields = '__all__'
 

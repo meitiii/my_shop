@@ -103,3 +103,19 @@ class ProductImage(models.Model):
             super().save(*args, **kwargs)
 
 
+class HeroSlider(models.Model):
+    title = models.CharField(max_length=100, help_text="Example: Galaxy S24 Ultra")
+    subtitle = models.CharField(max_length=100, blank=True, help_text="Small text above the title")
+    description = models.TextField(blank=True, help_text="Description under the title")
+    image = models.ImageField(upload_to='sliders/')
+    button_text = models.CharField(max_length=50, default="Shop Now")
+    button_link = models.CharField(max_length=255, default="/", help_text="Button link (example: /product/1)")
+    
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0, help_text="Display order")
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return self.title

@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets,filters
 from rest_framework.permissions import AllowAny
-from .models import Products,Category,ProductVariant,ProductImage,Brand
-from .serializers import ProductSerializer,CategorySerializer,ProductImageSerializer,ProductVariantSerializer,BrandSerializer
+from .models import Products,Category,ProductVariant,ProductImage,Brand,HeroSlider
+from .serializers import ProductSerializer,CategorySerializer,ProductImageSerializer,ProductVariantSerializer,BrandSerializer,HeroSliderSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg,Q,Min
 from .permissions import IsAdminOrReadOnly
@@ -99,5 +99,15 @@ class ProductViewSet(ModelViewSet):
         instance.save(update_fields=['views_count'])
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
+class HeroSliderViewSet(viewsets.ModelViewSet):
+    serializer_class = HeroSliderSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_queryset(self):
+        if self.request.user and self.request.user.is_staff:
+            return HeroSlider.objects.all().order_by('order')
+        return HeroSlider.objects.filter(is_active=True).order_by('order')
 
 
