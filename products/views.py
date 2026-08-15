@@ -10,7 +10,6 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters import rest_framework as django_filters
 from rest_framework.response import Response
 class ProductFilter(django_filters.FilterSet):
-
     brand = django_filters.BaseInFilter(
         field_name='brand',
         lookup_expr='in'
@@ -20,8 +19,15 @@ class ProductFilter(django_filters.FilterSet):
         method='filter_category'
     )
 
+
+    min_price = django_filters.NumberFilter(field_name='variants__price', lookup_expr='gte', distinct=True)
+    max_price = django_filters.NumberFilter(field_name='variants__price', lookup_expr='lte', distinct=True)
+
+    in_stock = django_filters.BooleanFilter(method='filter_in_stock')
+
+    min_rating = django_filters.NumberFilter(field_name='average_rating', lookup_expr='gte')
+
     def filter_category(self, queryset, name, value):
-        
         if not value:
             return queryset
 
@@ -34,16 +40,18 @@ class ProductFilter(django_filters.FilterSet):
 
         def collect_children(parent_id):
             children = Category.objects.filter(parent_id=parent_id)
-
             for child in children:
                 category_ids.append(child.id)
                 collect_children(child.id)
 
         collect_children(category.id)
 
-        return queryset.filter(
-            category_id__in=category_ids
-        )
+        return queryset.filter(category_id__in=category_ids)
+
+    def filter_in_stock(self, queryset, name, value):
+        if value:
+            return queryset.filter(variants__stock__gt=0).distinct()
+        return queryset
 
     class Meta:
         model = Products
