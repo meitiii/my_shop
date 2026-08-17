@@ -9,6 +9,9 @@ from .permissions import IsAdminOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 from django_filters import rest_framework as django_filters
 from rest_framework.response import Response
+from rest_framework.decorators import action
+
+
 class ProductFilter(django_filters.FilterSet):
     brand = django_filters.BaseInFilter(
         field_name='brand',
@@ -18,7 +21,6 @@ class ProductFilter(django_filters.FilterSet):
     category = django_filters.NumberFilter(
         method='filter_category'
     )
-
 
     min_price = django_filters.NumberFilter(field_name='variants__price', lookup_expr='gte', distinct=True)
     max_price = django_filters.NumberFilter(field_name='variants__price', lookup_expr='lte', distinct=True)
@@ -56,6 +58,8 @@ class ProductFilter(django_filters.FilterSet):
     class Meta:
         model = Products
         fields = ['category', 'brand', 'is_active']
+
+
 class ProductImageViewSet(ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
@@ -101,6 +105,68 @@ class ProductViewSet(ModelViewSet):
         'is_featured'      
     ]
 
+    def filter_queryset(self, queryset):
+     
+        queryset = super().filter_queryset(queryset)
+        
+        spec_filters = {}
+       
+        feature_filters = self.request.query_params.getlist('feature')
+
+        for key, value in self.request.query_params.items():
+            if key.startswith('spec_'):
+                spec_key = key.replace('spec_', '')
+                spec_filters[f'technical_specs__{spec_key}__icontains'] = value
+                
+        if spec_filters:
+            queryset = queryset.filter(**spec_filters)
+      
+        if feature_filters:
+            for feat in feature_filters:
+                queryset = queryset.filter(features__contains=[feat])
+            
+        return queryset
+
+    
+    @action(detail=False, methods=['get'])
+    def available_filters(self, request):
+        base_queryset = super().filter_queryset(self.get_queryset())
+        
+        specs_list = base_queryset.exclude(technical_specs__isnull=True)\
+                                  .exclude(technical_specs={})\
+                                  .values_list('technical_specs', flat=True)
+                                  
+        dynamic_filters = {}
+        for specs in specs_list:
+            if isinstance(specs, dict):
+                for key, value in specs.items():
+                    val_str = str(value).strip()
+                    if not val_str:
+                        continue
+                    if key not in dynamic_filters:
+                        dynamic_filters[key] = set()
+                    dynamic_filters[key].add(val_str)
+                    
+        formatted_filters = {
+            k: sorted(list(v)) for k, v in dynamic_filters.items()
+        }
+
+        features_list = base_queryset.exclude(features__isnull=True)\
+                                     .exclude(features=[])\
+                                     .values_list('features', flat=True)
+        
+        unique_features = set()
+        for feats in features_list:
+            if isinstance(feats, list): 
+                for f in feats:
+                    val_str = str(f).strip()
+                    if val_str:
+                        unique_features.add(val_str)
+        
+        if unique_features:
+            formatted_filters['Special Features'] = sorted(list(unique_features))
+            
+        return Response(formatted_filters)
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()    
         instance.views_count +=1
