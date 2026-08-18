@@ -14,7 +14,7 @@ class User(AbstractUser):
 
 
 
-class Address(models.Model):
+class Address(models.Model):    
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='addresses')
     title = models.CharField(max_length=50,help_text='For example: home, workplace')
     state = models.CharField(max_length=50,blank=True,null=True)
